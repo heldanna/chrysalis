@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coins, User, Lock, ShoppingBag, TrendingUp, ChevronRight } from 'lucide-react';
-// --- THE KEY IMPORT ---
+
 import StockMarket from './StockMarket'; 
 
 const App = () => {
