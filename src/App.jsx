@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Coins, User, Lock, ShoppingBag, TrendingUp, ChevronRight } from 'lucide-react';
 
 const App = () => {
-  const [coins, setCoins] = useState(150);
-  const [currentStage, setCurrentStage] = useState(1); // Stage 1 is the active "Bubble"
-  const [showProfile, setShowProfile] = useState(false);
+    const [showMarket, setShowMarket] = useState(false);
+    const [coins, setCoins] = useState(150);
+    const [currentStage, setCurrentStage] = useState(1); // Stage 1 is the active "Bubble"
+    // const [showProfile, setShowProfile] = useState(false);
 
   const lessons = [
     { id: 0, title: 'The Egg', x: 100, y: 500, type: 'egg' },
@@ -40,7 +41,9 @@ const App = () => {
           { icon: <ShoppingBag />, label: 'Shop' },
           { icon: <TrendingUp />, label: 'Stocks' }
         ].map((item) => (
-          <div key={item.label} className="w-12 h-12 glass-bubble rounded-2xl flex items-center justify-center cursor-pointer group hover:bg-white/60 transition-all border-white/50 shadow-sm">
+          <div key={item.label}
+          onClick={() => setShowMarket(true)}
+          className="w-12 h-12 glass-bubble rounded-2xl flex items-center justify-center cursor-pointer group hover:bg-white/60 transition-all border-white/50 shadow-sm">
             <div className="text-soft-blue">{item.icon}</div>
           </div>
         ))}
@@ -103,7 +106,17 @@ const App = () => {
           );
         })}
       </div>
-    </div>
+      {/* Add this right before the last </div> */}
+      {showMarket && (
+        <div className="fixed inset-0 z-[100]">
+          <StockMarket 
+            coins={coins} 
+            setCoins={setCoins} 
+            onClose={() => setShowMarket(false)} 
+          />
+        </div>
+      )}
+    </div> // This is the final closing div of App.jsx
   );
 };
 
