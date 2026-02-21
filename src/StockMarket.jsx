@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label } from 'recharts';
-import { ChevronLeft, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { ChevronLeft, TrendingUp } from 'lucide-react';
 
 const StockMarket = ({ coins, setCoins, onClose }) => {
   const [stocks, setStocks] = useState([
@@ -19,7 +19,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
         const change = (Math.random() - 0.5) * 8;
         const newPrice = Math.max(5, Math.round(stock.price + change));
         const newTime = new Date().toLocaleTimeString([], { minute: '2-digit', second: '2-digit' });
-
 
         const newHistory = [...(stock.history || []), { time: newTime, price: newPrice }].slice(-10);
 
@@ -42,8 +41,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
 
   return (
     <div className="w-full h-full bg-slate-50 flex flex-col font-sans">
-
-
       <div className="bg-white border-b border-slate-200 px-8 py-6 flex justify-between items-center shadow-sm">
         <div>
           <button
@@ -55,8 +52,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
           </button>
           <h2 className="text-3xl font-black text-slate-800 tracking-tight">Market Exchange</h2>
         </div>
-      </div>
-
         <div className="flex gap-4">
           <div className="bg-green-50 px-6 py-2 rounded-2xl border border-green-100">
             <p className="text-[10px] font-bold text-green-600 uppercase tracking-widest">Available Balance</p>
@@ -65,11 +60,8 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
         </div>
       </div>
 
-
-
       <div className="flex-1 overflow-y-auto p-8">
         <div className="max-w-6xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr className="text-slate-400 text-xs font-black uppercase tracking-widest">
@@ -94,12 +86,10 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
                       ${stock.price}
                     </td>
 
-
                     <td className="px-8 py-6">
                       <div className="text-sm font-black text-slate-700">{stock.owned} Units</div>
                       <div className="text-[10px] text-slate-400 font-bold uppercase">Equity: ${stock.owned * stock.price}</div>
                     </td>
-
 
                     <td className="px-8 py-6 text-center">
                       <button
@@ -109,7 +99,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
                         <TrendingUp size={20} />
                       </button>
                     </td>
-
 
                     <td className="px-8 py-6 text-right">
                       <div className="flex justify-end gap-2">
@@ -128,8 +117,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
                       </div>
                     </td>
                   </tr>
-
-
 
                   {selectedStockId === stock.id && (
                     <tr>
@@ -188,6 +175,5 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
     </div>
   );
 };
-
 
 export default StockMarket;
