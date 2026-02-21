@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Label } from 'recharts';
 import { ChevronLeft, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 
-
 const StockMarket = ({ coins, setCoins, onClose }) => {
   const [stocks, setStocks] = useState([
     { id: 1, code: 'CHRY', name: 'Chrysalis Tech', price: 120, history: [], owned: 0 },
@@ -12,10 +11,8 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
     { id: 5, code: 'ROOT', name: 'Root Security', price: 155, history: [], owned: 0 },
   ]);
 
-
   const [selectedStockId, setSelectedStockId] = useState(null);
-
-
+  
   useEffect(() => {
     const interval = setInterval(() => {
       setStocks(prevStocks => prevStocks.map(stock => {
@@ -32,7 +29,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
     return () => clearInterval(interval);
   }, []);
 
-
   const handleTrade = (id, type) => {
     const stock = stocks.find(s => s.id === id);
     if (type === 'buy' && coins >= stock.price) {
@@ -43,7 +39,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
       setStocks(stocks.map(s => s.id === id ? { ...s, owned: s.owned - 1 } : s));
     }
   };
-
 
   return (
     <div className="w-full h-full bg-slate-50 flex flex-col font-sans">
@@ -60,7 +55,7 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
           </button>
           <h2 className="text-3xl font-black text-slate-800 tracking-tight">Market Exchange</h2>
         </div>
-
+      </div>
 
         <div className="flex gap-4">
           <div className="bg-green-50 px-6 py-2 rounded-2xl border border-green-100">
