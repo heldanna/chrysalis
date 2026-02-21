@@ -1,2 +1,2 @@
-# chrysalis
+# Chrysalis
 WiNGHacks 2026
