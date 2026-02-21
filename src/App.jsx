@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Coins, User, Lock, ShoppingBag, TrendingUp, ChevronRight } from 'lucide-react';
+import StockMarket from './StockMarket';
 
 const App = () => {
     const [showMarket, setShowMarket] = useState(false);
     const [coins, setCoins] = useState(150);
     const [currentStage, setCurrentStage] = useState(1); // Stage 1 is the active "Bubble"
-    // const [showProfile, setShowProfile] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
   const lessons = [
     { id: 0, title: 'The Egg', x: 100, y: 500, type: 'egg' },
@@ -106,7 +107,6 @@ const App = () => {
           );
         })}
       </div>
-      {/* Add this right before the last </div> */}
       {showMarket && (
         <div className="fixed inset-0 z-[100]">
           <StockMarket 
@@ -116,7 +116,7 @@ const App = () => {
           />
         </div>
       )}
-    </div> // This is the final closing div of App.jsx
+    </div>
   );
 };
 
