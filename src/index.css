@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-coral-red: #F87171;
+  --color-soft-blue: #60A5FA;
+  --color-petal-pink: #F472B6;
+}
+
+:root {
+  background: linear-gradient(135deg, #eff6ff 0%, #fdf2f8 50%, #eff6ff 100%);
+  min-height: 100vh;
+}
+
+/* Custom Glassmorphism for your bubble UI */
+.glass-bubble {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
