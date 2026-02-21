@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --color-soft-blue: #60A5FA;
+  --color-petal-pink: #F472B6;
+  --color-coral-red: #F87171;
+}
+
+/* Literal Bubble Effect: Iridescent & Translucent */
+.soap-bubble {
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 
+    inset 0 0 20px rgba(255, 255, 255, 0.5),
+    inset 10px -10px 30px rgba(165, 180, 252, 0.3),
+    inset -10px 10px 30px rgba(244, 114, 182, 0.3),
+    0 10px 30px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+/* The Shine on the bubble */
+.soap-bubble::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  width: 25%;
+  height: 25%;
+  background: white;
+  filter: blur(4px);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.glass-bubble {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
