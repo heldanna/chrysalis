@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Coins, User, Lock, ShoppingBag,
-  TrendingUp, BookOpen, Settings, Check
+  TrendingUp, BookOpen, Settings, Check,
+  X, Loader2, AlertCircle
 } from 'lucide-react';
 import StockMarket from './StockMarket';
 import backgroundImage from './images/bg.jpg';
@@ -13,12 +14,13 @@ const loadProgress = () => {
   return saved ? parseInt(saved) : 1;
 };
 
+// Lessons with topics for AI agents
 const LESSONS = [
-  { id: 1, title: 'The Egg', x: 500, y: 1726 },
-  { id: 2, title: 'Basic Trading', x: 850, y: 1500 },
-  { id: 3, title: 'Market Trends', x: 400, y: 1090 },
-  { id: 4, title: 'Risk Management', x: 400, y: 550 },
-  { id: 5, title: 'Financial Freedom', x: 950, y: 150},
+  { id: 1, title: 'The Egg', x: 500, y: 1726, topic: 'budgeting' },
+  { id: 2, title: 'Basic Trading', x: 850, y: 1500, topic: 'trading' },
+  { id: 3, title: 'Market Trends', x: 400, y: 1090, topic: 'market_trends' },
+  { id: 4, title: 'Risk Management', x: 400, y: 550, topic: 'risk_management' },
+  { id: 5, title: 'Financial Freedom', x: 950, y: 150, topic: 'financial_freedom' },
 ];
 
 // SquiggleVine Component with your adjusted path
@@ -71,9 +73,8 @@ const NavItem = ({ icon, label, active = false, onClick }) => {
   );
 };
 
-
-// LessonNode Component with size prop
-const LessonNode = ({ lesson, status, onEarn, sizeMultiplier = 1.4 }) => {
+// LessonNode Component with AI integration
+const LessonNode = ({ lesson, status, onOpenAI, sizeMultiplier = 1.4 }) => {
   const isActive = status === 'active';
   const isLocked = status === 'locked';
   const isCompleted = status === 'completed';
@@ -134,9 +135,14 @@ const LessonNode = ({ lesson, status, onEarn, sizeMultiplier = 1.4 }) => {
     return '%236B7280';
   };
 
+  const handleClick = () => {
+    if (isLocked) return;
+    onOpenAI(lesson); // Open AI overlay for this lesson
+  };
+
   return (
     <motion.div 
-      className="absolute"
+      className="absolute cursor-pointer"
       style={{ 
         left: `${lesson.x}px`, 
         top: `${lesson.y}px`,
@@ -145,9 +151,10 @@ const LessonNode = ({ lesson, status, onEarn, sizeMultiplier = 1.4 }) => {
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: lesson.id * 0.1 }}
+      onClick={handleClick}
     >
       <div className="relative flex flex-col items-center">
-        {/* Glow effect */}
+        {/* Glow effect for active lesson */}
         {isActive && (
           <motion.div
             animate={{ 
@@ -175,8 +182,7 @@ const LessonNode = ({ lesson, status, onEarn, sizeMultiplier = 1.4 }) => {
         <motion.div
           whileHover={!isLocked ? { scale: 1.05, y: -5 } : {}}
           whileTap={!isLocked ? { scale: 0.95 } : {}}
-          onClick={() => isActive && onEarn()}
-          className={`relative cursor-pointer transition-all duration-300 z-10 ${
+          className={`relative transition-all duration-300 z-10 ${
             isLocked ? 'cursor-not-allowed opacity-60 grayscale' : ''
           }`}
           style={{
@@ -213,11 +219,222 @@ const LessonNode = ({ lesson, status, onEarn, sizeMultiplier = 1.4 }) => {
   );
 };
 
+// AI Lesson Overlay Component
+function AILessonOverlay({ lesson, onClose, onReward, onComplete }) {
+  const [loadingQuestion, setLoadingQuestion] = useState(true);
+  const [loadingFeedback, setLoadingFeedback] = useState(false);
+  const [quizData, setQuizData] = useState(null);
+  const [apiError, setApiError] = useState(null);
+  const [userAnswer, setUserAnswer] = useState('');
+  const [feedbackData, setFeedbackData] = useState(null);
+
+  const [sessionId] = useState(() => `session_${Date.now()}`);
+
+  useEffect(() => {
+    const fetchQuestion = async () => {
+      try {
+        setApiError(null);
+        const response = await fetch('http://127.0.0.1:8000/api/question/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: lesson.topic,
+            difficulty: 'beginner',
+            session_id: sessionId
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+          setApiError(`AI Agent Error: ${data.error}`);
+        } else if (!data.options || !data.question) {
+          setApiError("The AI Agent returned an invalid response format.");
+        } else {
+          setQuizData(data);
+        }
+
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        setApiError("Could not connect to Django server. Is it running on port 8000?");
+      } finally {
+        setLoadingQuestion(false);
+      }
+    };
+
+    fetchQuestion();
+  }, [lesson.topic, sessionId]);
+
+  const submitAnswer = async () => {
+    if (!userAnswer) return;
+    setLoadingFeedback(true);
+    setApiError(null);
+    try {
+      const selectedOptionText = quizData.options.find(opt => opt.startsWith(userAnswer));
+
+      const response = await fetch('http://127.0.0.1:8000/api/explain/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: quizData.question,
+          options: quizData.options,
+          user_answer: userAnswer,
+          correct_answer: quizData.correct_answer,
+          user_explanation: `I chose ${selectedOptionText} because it seemed like the best answer.`,
+          session_id: sessionId,
+          topic: lesson.topic
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setApiError(`AI Feedback Error: ${data.error}`);
+      } else {
+        setFeedbackData(data);
+        if (data.is_correct) onReward();
+      }
+
+    } catch (error) {
+      console.error("Submit Error:", error);
+      setApiError("Could not connect to Django server to get feedback.");
+    } finally {
+      setLoadingFeedback(false);
+    }
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      exit={{ opacity: 0 }} 
+      className="fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+    >
+      <motion.div 
+        initial={{ scale: 0.9, y: 20 }} 
+        animate={{ scale: 1, y: 0 }} 
+        exit={{ scale: 0.9, y: 20 }} 
+        className="bg-white w-full max-w-2xl rounded-[32px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+      >
+        <div className="bg-blue-500 text-white p-6 flex justify-between items-center z-10 shadow-sm">
+          <h3 className="text-xl font-black">Lesson {lesson.id}: {lesson.title}</h3>
+          <button onClick={onClose} className="p-1 hover:bg-white/20 rounded-full transition-colors">
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="p-6 md:p-10 overflow-y-auto">
+          <div className="space-y-6 text-slate-700 text-lg leading-relaxed">
+            <h4 className="font-black text-2xl text-blue-900 mb-4">The Golden Rule of Budgeting</h4>
+            <p>Imagine you have a single, golden egg. If you crack it open today, you have a nice meal. But if you protect it, incubate it, and let it hatch, you eventually get a goose that lays more eggs for you. In finance, we call this your <strong>Nest Egg</strong>.</p>
+            <p>Before you can start trading in the market, building a business, or investing in your future, you need to understand exactly what money comes into your life and what money leaves it. This is the core of <strong>budgeting</strong>.</p>
+            
+            <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 my-6 shadow-inner">
+              <h5 className="font-bold text-blue-800 mb-2">The 50/30/20 Framework</h5>
+              <p className="text-base text-slate-600 mb-3">A common strategy to protect your "egg" is to split your income into three distinct baskets:</p>
+              <ul className="list-disc list-inside space-y-2 text-base font-medium">
+                <li><span className="text-blue-600">50% Needs:</span> Rent, groceries, utilities.</li>
+                <li><span className="text-pink-500">30% Wants:</span> Hobbies, dining out, entertainment.</li>
+                <li><span className="text-green-600">20% Savings:</span> Your future nest egg and investments.</li>
+              </ul>
+            </div>
+            <p>A budget isn't meant to restrict you; it's meant to act as a map. Without a map, your cash simply gets lost. The ultimate goal is simple: <strong>always spend less than you earn</strong>, and redirect the difference toward your future.</p>
+          </div>
+
+          <hr className="my-10 border-slate-200 border-2 rounded-full" />
+
+          {/* AI AGENT SECTION */}
+          <div className="bg-slate-50 p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <h4 className="font-black text-xl text-slate-800 mb-6 flex items-center gap-2">
+              <Check className="text-blue-500" /> Interactive Knowledge Check
+            </h4>
+
+            {apiError ? (
+              <div className="bg-red-50 border-2 border-red-200 p-6 rounded-xl flex items-start gap-3">
+                <AlertCircle className="text-red-500 shrink-0" />
+                <div>
+                  <h5 className="font-bold text-red-800">Connection Failed</h5>
+                  <p className="text-red-600 text-sm mt-1">{apiError}</p>
+                </div>
+              </div>
+            ) : loadingQuestion ? (
+              <div className="flex flex-col items-center justify-center py-10 space-y-4 text-slate-400">
+                <Loader2 className="animate-spin size-8" />
+                <p className="font-medium">The AI Agent is writing your question...</p>
+              </div>
+            ) : !feedbackData && quizData ? (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <p className="font-bold text-lg text-slate-800">{quizData.question}</p>
+                <div className="space-y-3">
+                  {quizData.options.map((opt, idx) => {
+                    const letter = opt.charAt(0);
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setUserAnswer(letter)}
+                        className={`w-full text-left p-4 rounded-xl border-2 transition-all font-medium ${
+                          userAnswer === letter ? 'border-blue-500 bg-blue-100/50 text-blue-900' : 'border-slate-200 hover:border-blue-300 bg-white'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <button
+                  onClick={submitAnswer}
+                  disabled={loadingFeedback || !userAnswer}
+                  className="w-full py-4 mt-2 bg-blue-500 disabled:bg-slate-300 hover:bg-blue-600 text-white font-black text-lg rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                  {loadingFeedback ? <Loader2 className="animate-spin" /> : 'Get AI Feedback'}
+                </button>
+              </div>
+            ) : null}
+
+            {feedbackData && (
+              <div className="space-y-6 text-center animate-in zoom-in-95 duration-500">
+                <div className="text-6xl mb-2">{feedbackData.is_correct ? '🎉' : '💡'}</div>
+                <h4 className={`text-2xl font-black ${feedbackData.is_correct ? 'text-green-600' : 'text-blue-600'}`}>
+                  {feedbackData.is_correct ? 'Excellent Work!' : 'Let\'s Review.'}
+                </h4>
+                
+                <div className="bg-white p-6 rounded-2xl text-left border border-slate-200 shadow-sm mt-4">
+                  <p className="font-black text-slate-800 mb-2">Personalized Feedback:</p>
+                  <p className="text-slate-600 italic mb-5 leading-relaxed">"{feedbackData.feedback}"</p>
+                  <hr className="my-4 border-slate-100" />
+                  <p className="font-black text-slate-800 mb-2">The Concept:</p>
+                  <p className="text-slate-700 leading-relaxed">{feedbackData.explanation}</p>
+                </div>
+
+                <p className="font-bold text-pink-500 text-lg mt-4">{feedbackData.encouragement}</p>
+
+                <button
+                  onClick={() => {
+                    if (feedbackData.is_correct) {
+                      onComplete(lesson.id);
+                    }
+                    onClose();
+                  }}
+                  className="w-full py-4 mt-6 bg-green-500 hover:bg-green-600 text-white font-black text-lg rounded-2xl transition-all shadow-lg"
+                >
+                  Finish Lesson
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function App() {
   const [coins, setCoins] = useState(1250);
   const [showMarket, setShowMarket] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(loadProgress);
   const [vineProgress, setVineProgress] = useState(0);
+  const [activeAILesson, setActiveAILesson] = useState(null);
 
   useEffect(() => {
     localStorage.setItem('chrysalis-progress', currentLevel.toString());
@@ -239,6 +456,18 @@ export default function App() {
     return 'locked';
   };
 
+  const handleOpenAI = (lesson) => {
+    setActiveAILesson(lesson);
+  };
+
+  const handleAIClose = () => {
+    setActiveAILesson(null);
+  };
+
+  const handleAIReward = () => {
+    setCoins(c => c + 100);
+  };
+
   return (
     <div className="relative min-h-screen">
       {/* Background image with opacity - completely separate from content */}
@@ -249,7 +478,7 @@ export default function App() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          opacity: 0.4, // ← Adjust this value (0.1 to 1.0) to control background opacity
+          opacity: 0.4,
           zIndex: 0
         }}
       />
@@ -299,13 +528,13 @@ export default function App() {
                 />
               </div>
 
-              {/* Lilypads */}
+              {/* Lilypads with AI integration */}
               {LESSONS.map((lesson) => (
                 <LessonNode
                   key={lesson.id}
                   lesson={lesson}
                   status={getLessonStatus(lesson.id)}
-                  onEarn={() => handleLevelComplete(lesson.id)}
+                  onOpenAI={handleOpenAI}
                 />
               ))}
             </div>
@@ -328,6 +557,18 @@ export default function App() {
                 onClose={() => setShowMarket(false)}
               />
             </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* AI Lesson Overlay */}
+        <AnimatePresence>
+          {activeAILesson && (
+            <AILessonOverlay
+              lesson={activeAILesson}
+              onClose={handleAIClose}
+              onReward={handleAIReward}
+              onComplete={handleLevelComplete}
+            />
           )}
         </AnimatePresence>
       </div>
