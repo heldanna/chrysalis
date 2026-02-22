@@ -15,7 +15,7 @@ Tone: patient, encouraging, like a good TA not a textbook.
 `;
 
 const model = genAI.getGenerativeModel({ 
-  model: "gemini-1.5-flash",
+  model: "models/gemini-1.5-flash",
   systemInstruction: `${AGENT_DESCRIPTION}\n\n${AGENT_INSTRUCTIONS}`
 });
 
