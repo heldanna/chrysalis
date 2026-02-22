@@ -1,0 +1,5 @@
+django>=4.2
+djangorestframework>=3.14
+django-cors-headers>=4.3
+google-generativeai>=0.8
+python-dotenv>=1.0
