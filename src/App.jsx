@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Coins, User, Lock, ShoppingBag,
-  TrendingUp, BookOpen, Settings, Check,
+  TrendingUp, BookOpen, Check,
   X, Loader2, AlertCircle
 } from 'lucide-react';
 import StockMarket from './StockMarket';
@@ -496,7 +496,6 @@ export default function App() {
               onClick={() => setShowMarket(true)}
             />
             <NavItem icon={<ShoppingBag />} label="Shop" />
-            <NavItem icon={<Settings />} label="Settings" />
           </nav>
         </aside>
 
