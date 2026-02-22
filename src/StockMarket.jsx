@@ -40,7 +40,7 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
   };
 
   return (
-    <div className="w-full h-full bg-slate-50 flex flex-col font-sans">
+    <div className="w-screen h-screen bg-slate-50 flex flex-col font-sans overflow-hidden">
       <div className="bg-white border-b border-slate-200 px-8 py-6 flex justify-between items-center shadow-sm">
         <div>
           <button
