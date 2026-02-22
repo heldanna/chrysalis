@@ -16,11 +16,11 @@ const loadProgress = () => {
 
 // Lessons with topics for AI agents
 const LESSONS = [
-  { id: 1, title: 'The Egg', x: 500, y: 1726, topic: 'budgeting' },
-  { id: 2, title: 'Basic Trading', x: 850, y: 1500, topic: 'trading' },
-  { id: 3, title: 'Market Trends', x: 400, y: 1090, topic: 'market_trends' },
-  { id: 4, title: 'Risk Management', x: 400, y: 550, topic: 'risk_management' },
-  { id: 5, title: 'Financial Freedom', x: 950, y: 150, topic: 'financial_freedom' },
+  { id: 1, title: 'Budgeting Basics', x: 500, y: 1726, topic: 'budgeting' },
+  { id: 2, title: 'Saving Strategies', x: 850, y: 1500, topic: 'saving' },
+  { id: 3, title: 'Understanding Credit', x: 400, y: 1090, topic: 'credit' },
+  { id: 4, title: 'Investing Fundamentals', x: 400, y: 550, topic: 'investing' },
+  { id: 5, title: 'Taxes', x: 950, y: 150, topic: 'taxes' },
 ];
 
 // SquiggleVine Component with your adjusted path
