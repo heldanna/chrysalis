@@ -55,7 +55,6 @@ const StockMarket = ({ coins, setCoins, onClose }) => {
           </button>
           <h2 className="text-3xl font-black text-slate-800 tracking-tight">Market Exchange</h2>
         </div>
-      </div>
 
         <div className="flex gap-4">
           <div className="bg-green-50 px-6 py-2 rounded-2xl border border-green-100">
