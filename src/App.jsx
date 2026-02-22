@@ -5,7 +5,6 @@ import {
  TrendingUp, BookOpen, Settings, Check, X, Loader2, AlertCircle
 } from 'lucide-react';
 
-
 import StockMarket from './StockMarket';
 
 
@@ -17,7 +16,6 @@ const INITIAL_LESSONS = [
  { id: 4, title: 'Risk Management', status: 'locked', x: 450, y: 600 },
  { id: 5, title: 'Financial Freedom', status: 'locked', x: 300, y: 300 },
 ];
-
 
 export default function App() {
  const [coins, setCoins] = useState(1250);
@@ -126,7 +124,6 @@ export default function App() {
    </div>
  );
 }
-
 
 // --- LESSON OVERLAY COMPONENT ---
 
@@ -360,7 +357,6 @@ function NavItem({ icon, label, active = false, onClick }) {
  );
 }
 
-
 function LessonNode({ lesson, onEarn, onOpenAI }) {
  const isActive = lesson.status === 'active';
  const isLocked = lesson.status === 'locked';
@@ -394,4 +390,3 @@ function LessonNode({ lesson, onEarn, onOpenAI }) {
    </div>
  );
 }
-
